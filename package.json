@@ -1,14 +1,14 @@
 {
-  "name": "matchjs",
+  "name": "pmjs",
   "version": "1.0.0",
-  "description": "JS Pattern matching library backed by typescript",
+  "description": "Javascript pattern matching utility backed by typescript",
   "main": "index.js",
   "scripts": {
     "test": "test"
   },
   "repository": {
     "type": "git",
-    "url": "gitblabla"
+    "url": "https://github.com/ritmos/pmjs"
   },
   "keywords": [
     "pattern",
