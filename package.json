@@ -1,0 +1,19 @@
+{
+  "name": "matchjs",
+  "version": "1.0.0",
+  "description": "JS Pattern matching library backed by typescript",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "gitblabla"
+  },
+  "keywords": [
+    "pattern",
+    "matching"
+  ],
+  "author": "ritmos",
+  "license": "GPL-3.0"
+}
