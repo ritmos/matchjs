@@ -1,5 +1,5 @@
 {
-  "name": "pmjs",
+  "name": "patmatjs",
   "version": "1.0.0",
   "description": "Javascript pattern matching utility backed by typescript",
   "main": "index.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ritmos/pmjs"
+    "url": "https://github.com/ritmos/patmatjs"
   },
   "keywords": [
     "pattern",
