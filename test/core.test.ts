@@ -49,3 +49,4 @@ test("sfdadf", () => {
 
     expect(result).toBe("Strength");
 });
+

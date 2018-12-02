@@ -323,14 +323,14 @@ class ObjectLikePattern<R, X> extends BaseMapper<R> implements Pattern<R> {
     }
 }
 
-class ObjectWithPattern<R> extends ObjectPattern<R> {
+class ObjectWithPattern<R> extends BaseMapper<R> implements Pattern<R> {
 
     constructor(readonly keys: string[], readonly mapper: R | ( (element: object) => R)) {
         super(mapper);
     }
 
     matches(element: any): boolean {
-        return super.matches(element) && ObjectWithPattern.contains(element, this.keys)
+        return typeof element === "object" && ObjectWithPattern.contains(element, this.keys)
     }
 
     static contains(element: object, keys: string[]): boolean {
