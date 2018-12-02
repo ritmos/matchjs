@@ -4,10 +4,10 @@ export function match<R>(element: any): Matcher<R> {
 }
 
 export interface Matcher<R> {
-    caseClass<T extends ClassType>(type: T, mapper: (element: InstanceType<T>) => R): Matcher<R>;
-    caseClass<T extends ClassType>(type: T, mapper: R): Matcher<R>;
-    caseClassLike<T extends ClassType>(type: T, test: (element: InstanceType<T>) => boolean, mapper: (element: InstanceType<T>) => R): Matcher<R>;
-    caseClassLike<T extends ClassType>(type: T, test: (element: InstanceType<T>) => boolean, mapper: R): Matcher<R>;
+    caseInstance<T extends Class | Function>(constructor: T, mapper: (element: T extends Class ? InstanceType<T> : any) => R): Matcher<R>;
+    caseInstance<T extends Class | Function>(constructor: T, mapper: R): Matcher<R>;
+    caseInstanceLike<T extends Class | Function>(type: T, test: (element: T extends Class ? InstanceType<T> : any) => boolean, mapper: (element: T extends Class ? InstanceType<T> : any) => R): Matcher<R>;
+    caseInstanceLike<T extends Class | Function>(type: T, test: (element: T extends Class ? InstanceType<T> : any) => boolean, mapper: R): Matcher<R>;
     caseTrue(mapper: () => R);
     caseTrue(mapper: R);
     caseFalse(mapper: () => R);
@@ -40,9 +40,13 @@ export interface Matcher<R> {
     default(mapper: R): R;
 }
 
-interface ClassType {
+interface Class {
     new(...args: any[]);
 }
+
+type Instance<T> =
+    T extends Class ? InstanceType<T> : any;
+
 
 class MatcherImpl<R> implements Matcher<R>{
 
@@ -50,13 +54,13 @@ class MatcherImpl<R> implements Matcher<R>{
 
     constructor(readonly element: any) {}
 
-    caseClass<T extends ClassType>(type: T, mapper: R | ((element: InstanceType<T>) => (R))): Matcher<R> {
-        this.patterns.push(new TypePattern(type, mapper));
+    caseInstance<T extends Class | Function>(constructor: T, mapper: R | ((element: Instance<T>) => R)): Matcher<R> {
+        this.patterns.push(new InstancePattern(constructor, mapper));
         return this;
     }
 
-    caseClassLike<T extends ClassType>(type: T, test: (element: InstanceType<T>) => boolean, mapper: R | ((element: InstanceType<T>) => (R))): Matcher<R> {
-        this.patterns.push(new TypeLikePattern(type, test, mapper));
+    caseInstanceLike<T extends Class | Function>(type: T, test: (element: Instance<T>) => boolean, mapper: R | ((element: Instance<T>) => (R))): Matcher<R> {
+        this.patterns.push(new InstanceLikePattern(type, test, mapper));
         return this;
     }
 
@@ -139,14 +143,6 @@ class MatcherImpl<R> implements Matcher<R>{
                 return pattern.map(this.element);
         }
     }
-
-
-
-
-
-
-
-
 }
 
 
@@ -166,25 +162,25 @@ abstract class BaseMapper<R> {
     }
 }
 
-class TypePattern<T extends ClassType, R> extends BaseMapper<R> implements Pattern<R> {
+class InstancePattern<T extends Class | Function, R> extends BaseMapper<R> implements Pattern<R> {
 
-    constructor(readonly type: T, readonly mapper: R | ( (element: T) => R) ) {
+    constructor(readonly constructor: T, readonly mapper: R | ( (element: Instance<T>) => R) ) {
         super(mapper);
     }
 
     matches(element: any): boolean {
-        return element instanceof this.type;
+        return element instanceof this.constructor;
     }
 }
 
-class TypeLikePattern<T extends ClassType, R> extends TypePattern<T, R> implements Pattern<R> {
+class InstanceLikePattern<T extends Class | Function, R> extends BaseMapper<R> implements Pattern<R> {
 
-    constructor(readonly type: T, readonly test: (element: InstanceType<T>) => boolean, mapper: R | ( (element: T) => R) ) {
-        super(type, mapper);
+    constructor(readonly constructor: T, readonly test: (element: Instance<T>) => boolean, mapper: R | ( (element: Instance<T>) => R) ) {
+        super(mapper);
     }
 
     matches(element: any): boolean {
-        return super.matches(element) && this.test(element);
+        return element instanceof this.constructor && this.test(element);
     }
 }
 
