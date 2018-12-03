@@ -1,6 +1,6 @@
 import {match} from "../../src";
 
-test("caseInstanceLike should match an instance with certain props", () => {
+test("caseInstanceLike should match an instance with certain property", () => {
 
     const x = new ClassConstructor("yunco");
 
@@ -11,7 +11,7 @@ test("caseInstanceLike should match an instance with certain props", () => {
     expect(instanceMatches).toBeTruthy();
 });
 
-test("caseInstanceLike should not match an instance with wrong props", () => {
+test("caseInstanceLike should not match an instance with different property value", () => {
 
     const x = new ClassConstructor("canelo");
 
@@ -25,10 +25,12 @@ test("caseInstanceLike should not match an instance with wrong props", () => {
 // todo terminar los tests aqui
 
 function FunctionConstructor() {
+    // @ts-ignore
     this.origin = "function";
 }
 
 function AnotherFunctionConstructor() {
+    // @ts-ignore
     this.origin = "another function";
 }
 

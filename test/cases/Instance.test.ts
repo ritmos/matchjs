@@ -2,6 +2,7 @@ import {match} from "../../src";
 
 test("caseInstance should match an element constructed by a function", () => {
 
+    // @ts-ignore
     const x = new FunctionConstructor();
 
     const wasConstructedByFunction = match(x)
@@ -13,6 +14,7 @@ test("caseInstance should match an element constructed by a function", () => {
 
 test("caseInstance should match an element constructed by a function and use the instance in the mapper", () => {
 
+    // @ts-ignore
     const x = new FunctionConstructor();
 
     const origin = match(x)
@@ -24,6 +26,7 @@ test("caseInstance should match an element constructed by a function and use the
 
 test("caseInstance should NOT match an element when it is not an instance of the function", () => {
 
+    // @ts-ignore
     const x = new AnotherFunctionConstructor();
 
     const wasConstructedByFunction = match(x)
@@ -93,10 +96,12 @@ test("caseInstance should NOT match an element when it is not an instance", () =
 });
 
 function FunctionConstructor() {
+    // @ts-ignore
     this.origin = "function";
 }
 
 function AnotherFunctionConstructor() {
+    // @ts-ignore
     this.origin = "another function";
 }
 

@@ -4,16 +4,33 @@ class Clase {
     saludar() { return "hola"}
 }
 
-function Cosa() {
 
+function tuple<T extends string[]>(...a: T) :T{
+    return a;
 }
+
+
+function f<T extends Array<keyof any>>(props:T): Record<T[number], any> {
+
+    return null!;
+}
+
+
 
 test("blablabla", () => {
 
     const c = new Clase();
 
+    const keys = ["a", "b"];
+
+    const b = tuple("a", "b");
+    const bb = f(b);
+
+
+
+
     const result = match(c)
-        .caseClass(Clase, e => e.saludar())
+        .caseObjectWith(keys, e => e)
         .default("adios");
 
     expect(result).toBe("hola");

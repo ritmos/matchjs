@@ -8,10 +8,10 @@ export interface Matcher<R> {
     caseInstance<T extends Class | Function>(constructor: T, mapper: R): Matcher<R>;
     caseInstanceLike<T extends Class | Function>(type: T, test: (element: T extends Class ? InstanceType<T> : any) => boolean, mapper: (element: T extends Class ? InstanceType<T> : any) => R): Matcher<R>;
     caseInstanceLike<T extends Class | Function>(type: T, test: (element: T extends Class ? InstanceType<T> : any) => boolean, mapper: R): Matcher<R>;
-    caseTrue(mapper: () => R);
-    caseTrue(mapper: R);
-    caseFalse(mapper: () => R);
-    caseFalse(mapper: R);
+    caseTrue(mapper: () => R) : Matcher<R>;
+    caseTrue(mapper: R) : Matcher<R>;
+    caseFalse(mapper: () => R) : Matcher<R>;
+    caseFalse(mapper: R) : Matcher<R>;
     // caseArray??
     // caseCustomPattern
     caseObject(mapper: (element: object) => R): Matcher<R>;
@@ -40,8 +40,12 @@ export interface Matcher<R> {
     default(mapper: R): R;
 }
 
+class StaticMatcherConstructor<R> {
+
+}
+
 interface Class {
-    new(...args: any[]);
+    new(...args: any[]): Class;
 }
 
 type Instance<T> =
@@ -105,7 +109,8 @@ class MatcherImpl<R> implements Matcher<R>{
     }
 
     caseNumber(mapper: R | ((element: number) => R)): Matcher<R> {
-        return undefined;
+        this.patterns.push(new NumberPattern(mapper));
+        return this;
     }
 
     caseObject(mapper: R | ((element: object) => R)): Matcher<R> {
@@ -119,7 +124,7 @@ class MatcherImpl<R> implements Matcher<R>{
     }
 
     // todo change maper element type with a type that contains the checked keys
-    caseObjectWith(keys: string[], mapper: R | ((element: any) => R)): Matcher<R> {
+    caseObjectWith<K extends Array<string>>(keys: K, mapper: R | ((element: Record<number, keyof K>) => R)): Matcher<R> {
         this.patterns.push(new ObjectWithPattern(keys, mapper));
         return this;
     }
@@ -130,11 +135,24 @@ class MatcherImpl<R> implements Matcher<R>{
     }
 
     default(mapper: R | (() => R)): R {
-        this.patterns.push(new DefaultPattern(mapper));
-        return this.mapWithMatchingCase();
+        return new CaseResolver<R>(this.element, this.patterns, mapper).resolve();
+    }
+}
+
+class CaseResolver<R> {
+
+    readonly defaultMapper: BaseMapper<R>;
+
+    constructor(
+        readonly element: any,
+        readonly patterns: Pattern<R>[],
+        defaultValue: R | (() => R)
+    ) {
+        this.defaultMapper = new BaseMapper<R>(defaultValue);
     }
 
-    mapWithMatchingCase(): R {
+    resolve(): R {
+
         for (let i = 0; i < this.patterns.length; i++) {
 
             const pattern = this.patterns[i];
@@ -142,6 +160,8 @@ class MatcherImpl<R> implements Matcher<R>{
             if (pattern.matches(this.element))
                 return pattern.map(this.element);
         }
+
+        return this.defaultMapper.map(this.element);
     }
 }
 
@@ -152,7 +172,7 @@ interface Pattern<R> {
     map(element: any): R;
 }
 
-abstract class BaseMapper<R> {
+class BaseMapper<R> {
 
     constructor(readonly mapper: any) {}
 
@@ -308,7 +328,7 @@ class ObjectLikePattern<R, X> extends BaseMapper<R> implements Pattern<R> {
         return typeof element === "object" && ObjectLikePattern.isLike(element, this.other)
     }
 
-    static isLike<X>(element: object, other: X): boolean {
+    static isLike(element: any, other: any): boolean {
         const otherKeys = Object.keys(other);
         for (let i = 0; i < otherKeys.length; i++) {
             const key = otherKeys[i];
@@ -319,9 +339,9 @@ class ObjectLikePattern<R, X> extends BaseMapper<R> implements Pattern<R> {
     }
 }
 
-class ObjectWithPattern<R> extends BaseMapper<R> implements Pattern<R> {
+class ObjectWithPattern<R, K extends Array<string>> extends BaseMapper<R> implements Pattern<R> {
 
-    constructor(readonly keys: string[], readonly mapper: R | ( (element: object) => R)) {
+    constructor(readonly keys: K, readonly mapper: R | ( (element: Record<number, keyof K>) => R)) {
         super(mapper);
     }
 
@@ -329,7 +349,7 @@ class ObjectWithPattern<R> extends BaseMapper<R> implements Pattern<R> {
         return typeof element === "object" && ObjectWithPattern.contains(element, this.keys)
     }
 
-    static contains(element: object, keys: string[]): boolean {
+    static contains(element: any, keys: string[]): boolean {
         return keys.every(key => element[key] !== undefined)
     }
 }
@@ -345,18 +365,6 @@ class NullPattern<R> extends BaseMapper<R> implements Pattern<R> {
         return element == null;
     }
 }
-
-class DefaultPattern<R> extends BaseMapper<R> implements Pattern<R> {
-
-    constructor(readonly mapper: R | ( (element: any) => R)) {
-        super(mapper);
-    }
-
-    matches(element: any) {
-        return true;
-    }
-}
-
 
 /*
 los pattern de number que se llamen number+cosa
