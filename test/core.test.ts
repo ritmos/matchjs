@@ -1,4 +1,4 @@
-import {match} from "../src";
+import {match} from "../src/core";
 
 class Clase {
     saludar() { return "hola"}

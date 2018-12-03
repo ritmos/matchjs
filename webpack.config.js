@@ -1,12 +1,15 @@
 var path = require('path');
 
 module.exports = {
-    entry: './src/index.ts',
+    entry: {
+        "index": path.resolve(__dirname, './dist/esm/index.js')
+    },
     output: {
-        path: path.resolve(__dirname, 'dist'),
-        filename: 'index.js',
+        path: path.resolve(__dirname, 'dist/umd'),
+        filename: '[name].js',
         library: 'patmat',
-        libraryTarget: 'umd'
+        libraryTarget: 'umd',
+        globalObject: 'this'
     },
     module: {
         rules: [

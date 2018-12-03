@@ -1,4 +1,5 @@
-import {match} from "../../src";
+import {match} from "../../src/core";
+
 
 test("caseInstanceLike should match an instance with certain property", () => {
 
