@@ -2,7 +2,7 @@
   "name": "patmatjs",
   "version": "1.0.0",
   "description": "Javascript pattern matching utility backed by typescript",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "npx jest"
   },
