@@ -1,61 +1,106 @@
-export function match<R>(element: any): Matcher<R> {
-    return new MatcherImpl<R>(element);
+export function match(element: any): MatcherConstructor {
+    return new MatcherConstructor(element);
 }
 
-export interface Matcher<R> {
-    caseInstance<T extends Class | Function>(constructor: T, mapper: (element: T extends Class ? InstanceType<T> : any) => R): Matcher<R>;
-    caseInstance<T extends Class | Function>(constructor: T, mapper: R): Matcher<R>;
-    caseInstanceLike<T extends Class | Function>(type: T, test: (element: T extends Class ? InstanceType<T> : any) => boolean, mapper: (element: T extends Class ? InstanceType<T> : any) => R): Matcher<R>;
-    caseInstanceLike<T extends Class | Function>(type: T, test: (element: T extends Class ? InstanceType<T> : any) => boolean, mapper: R): Matcher<R>;
-    caseTrue(mapper: () => R) : Matcher<R>;
-    caseTrue(mapper: R) : Matcher<R>;
-    caseFalse(mapper: () => R) : Matcher<R>;
-    caseFalse(mapper: R) : Matcher<R>;
-    // caseArray??
-    // caseCustomPattern
-    caseObject(mapper: (element: object) => R): Matcher<R>;
-    caseObject(mapper: R): Matcher<R>;
-    caseObjectLike<O extends object>(other: O, mapper: (element: O) => R): Matcher<R>;
-    caseObjectLike<O extends object>(other: O, mapper: R): Matcher<R>;
-    caseObjectWith(keys: string[], mapper: (element: any) => R): Matcher<R>;
-    caseObjectWith(keys: string[], mapper: R): Matcher<R>;
-    caseNumber(mapper: (element: number) => R): Matcher<R>;
-    caseNumber(mapper: R): Matcher<R>;
-    caseString(mapper: (element: string) => R): Matcher<R>;
-    caseString(mapper: R): Matcher<R>;
-    caseBoolean(mapper: (element: boolean) => R): Matcher<R>;
-    caseBoolean(mapper: R): Matcher<R>;
-    caseEqual(otherElement: any, mapper: () => R): Matcher<R>;
-    caseEqual(otherElement: any, mapper: R): Matcher<R>;
-    caseAlmostEqual(otherElement: number, mapper: () => R, acceptedError?: number): Matcher<R>;
-    caseAlmostEqual(otherElement: number, mapper: R, acceptedError?: number): Matcher<R>;
-    caseGreater(otherElement: number, mapper: () => R): Matcher<R>;
-    caseGreater(otherElement: number, mapper: R): Matcher<R>;
-    caseLower(otherElement: number, mapper: () => R): Matcher<R>;
-    caseLower(otherElement: number, mapper: R): Matcher<R>;
-    caseNull(mapper: () => R | R): Matcher<R>;
-    caseNull(mapper: R): Matcher<R>;
-    default(mapper: () => R): R;
-    default(mapper: R): R;
-}
-
-class StaticMatcherConstructor<R> {
-
-}
 
 interface Class {
     new(...args: any[]): Class;
 }
 
+
 type Instance<T> =
     T extends Class ? InstanceType<T> : any;
 
 
-class MatcherImpl<R> implements Matcher<R>{
+class MatcherConstructor {
 
-    readonly patterns: Pattern<R>[] = [];
+    constructor(private readonly element: any) {}
 
-    constructor(readonly element: any) {}
+    enforceReturnType<R>() {
+        return new Matcher<R>(this.element);
+    }
+
+    caseInstance<R, T extends Class | Function>(constructor: T, mapper: R | ((element: Instance<T>) => R)): Matcher<R> {
+        return new Matcher(this.element, new InstancePattern(constructor, mapper));
+    }
+
+    caseInstanceLike<R, T extends Class | Function>(type: T, test: (element: Instance<T>) => boolean, mapper: R | ((element: Instance<T>) => (R))): Matcher<R> {
+        return new Matcher(this.element, new InstanceLikePattern(type, test, mapper));
+    }
+
+    caseTrue<R>(mapper: R | (() => R)): Matcher<R> {
+        return new Matcher(this.element, new TruePattern(mapper));
+    }
+
+    caseFalse<R>(mapper: R | (() => R)): Matcher<R> {
+        return new Matcher(this.element, new FalsePattern(mapper));
+    }
+
+    caseBoolean<R>(mapper: R | ((element: boolean) => R)): Matcher<R> {
+        return new Matcher(this.element, new BooleanPattern(mapper));
+    }
+
+    caseEqual<R>(otherElement: any, mapper: R | (() => R)): Matcher<R> {
+        return new Matcher(this.element, new EqualPattern(otherElement, mapper));
+    }
+
+    caseAlmostEqual<R>(otherElement: number, mapper: R | (() => R), acceptedError: number = 0.00000000001): Matcher<R> {
+        return new Matcher(this.element, new AlmostEqualPattern(otherElement, mapper, acceptedError));
+    }
+
+    caseGreater<R>(otherElement: any, mapper: R | (() => R)): Matcher<R> {
+        return new Matcher(this.element, new GreaterPattern(otherElement, mapper));
+    }
+
+    caseLower<R>(otherElement: any, mapper: R | (() => R)): Matcher<R> {
+        return new Matcher(this.element, new LowerPattern(otherElement, mapper));
+    }
+
+    caseNull<R>(mapper: R | (() => R)): Matcher<R> {
+        return new Matcher(this.element, new NullPattern(mapper));
+    }
+
+    caseNumber<R>(mapper: R | ((element: number) => R)): Matcher<R> {
+        return new Matcher(this.element, new NumberPattern(mapper));
+    }
+
+    caseObject<R>(mapper: R | ((element: object) => R)): Matcher<R> {
+        return new Matcher(this.element, new ObjectPattern(mapper));
+    }
+
+    caseObjectLike<R, O extends object>(other: O, mapper: R | ((element: O) => R)): Matcher<R> {
+        return new Matcher(this.element, new ObjectLikePattern(other, mapper));
+    }
+
+    // todo change maper element type with a type that contains the checked keys
+    caseObjectWith<R, K extends Array<string>>(keys: K, mapper: R | ((element: Record<number, keyof K>) => R)): Matcher<R> {
+        return new Matcher(this.element, new ObjectWithPattern(keys, mapper));
+    }
+
+    caseString<R>(mapper: R | ((element: string) => R)): Matcher<R> {
+        return new Matcher(this.element, new StringPattern(mapper));
+    }
+
+    caseStringLike<R>(test: RegExp, mapper: R | ((element: RegExpExecArray) => R)): Matcher<R> {
+        return new Matcher(this.element, new StringLikePattern(test, mapper));
+    }
+
+    caseEmptyString<R>(mapper: R | ((element: string) => R)): Matcher<R> {
+        return new Matcher(this.element, new EmptyStringPattern(mapper));
+    }
+}
+
+
+class Matcher<R> {
+
+    private readonly patterns: Pattern<R>[] = [];
+
+    constructor(private readonly element: any, startingPattern?: Pattern<R>) {
+
+        if (startingPattern != null)
+            this.patterns.push(startingPattern);
+
+    }
 
     caseInstance<T extends Class | Function>(constructor: T, mapper: R | ((element: Instance<T>) => R)): Matcher<R> {
         this.patterns.push(new InstancePattern(constructor, mapper));
@@ -133,24 +178,17 @@ class MatcherImpl<R> implements Matcher<R>{
         return this;
     }
 
+    caseStringLike(test: RegExp, mapper: R | ((element: RegExpExecArray) => R)): Matcher<R> {
+        this.patterns.push(new StringLikePattern(test, mapper));
+        return this;
+    }
+
+    caseEmptyString(mapper: R | ((element: string) => R)): Matcher<R> {
+        this.patterns.push(new EmptyStringPattern(mapper));
+        return this;
+    }
+
     default(mapper: R | (() => R)): R {
-        return new CaseResolver<R>(this.element, this.patterns, mapper).resolve();
-    }
-}
-
-class CaseResolver<R> {
-
-    readonly defaultMapper: BaseMapper<R>;
-
-    constructor(
-        readonly element: any,
-        readonly patterns: Pattern<R>[],
-        defaultValue: R | (() => R)
-    ) {
-        this.defaultMapper = new BaseMapper<R>(defaultValue);
-    }
-
-    resolve(): R {
 
         for (let i = 0; i < this.patterns.length; i++) {
 
@@ -160,10 +198,9 @@ class CaseResolver<R> {
                 return pattern.map(this.element);
         }
 
-        return this.defaultMapper.map(this.element);
+        return new BaseMapper<R>(mapper).map(this.element);
     }
 }
-
 
 
 interface Pattern<R> {
@@ -214,6 +251,17 @@ class EqualPattern<R> extends BaseMapper<R> implements Pattern<R> {
     }
 }
 
+class EmptyStringPattern<R> extends BaseMapper<R> implements Pattern<R> {
+
+    constructor(readonly mapper: R | ( (element: string) => R)) {
+        super(mapper);
+    }
+
+    matches(element: any) {
+        return typeof element === "string" && element.length === 0;
+    }
+}
+
 class StringPattern<R> extends BaseMapper<R> implements Pattern<R> {
 
     constructor(readonly mapper: R | ( (element: string) => R)) {
@@ -222,6 +270,24 @@ class StringPattern<R> extends BaseMapper<R> implements Pattern<R> {
 
     matches(element: any) {
         return typeof element === "string";
+    }
+}
+
+class StringLikePattern<R> implements Pattern<R> {
+
+    constructor(readonly test: RegExp, readonly mapper: R | ( (match: RegExpExecArray) => R)) {}
+
+    matches(element: any) {
+        return typeof element === "string" && this.test.exec(element) != null;
+    }
+
+    map(element: any): R {
+        if (typeof this.mapper !== "function")
+            return this.mapper;
+
+        const match = this.test.exec(element);
+
+        return (this.mapper as Function)(match);
     }
 }
 

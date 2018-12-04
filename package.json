@@ -8,7 +8,7 @@
   "scripts": {
     "test": "npx jest",
     "prebuild": "tsc",
-    "build": "webpack"
+    "build": "webpack --mode=production"
   },
   "repository": {
     "type": "git",
