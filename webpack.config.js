@@ -8,9 +8,9 @@ module.exports = {
         path: path.resolve(__dirname, 'dist/umd'),
         filename: '[name].js',
         library: 'match', // name of the global object
-        libraryTarget: 'umd',
-        globalObject: 'this',
-        libraryExport: 'match' // we expose the match function directly
+        libraryTarget: "umd",
+        umdNamedDefine: true,
+        //libraryExport: 'match' // we expose the match function directly
     },
     module: {
         rules: [
