@@ -7,9 +7,10 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, 'dist/umd'),
         filename: '[name].js',
-        library: 'patmat',
+        library: 'match', // name of the global object
         libraryTarget: 'umd',
-        globalObject: 'this'
+        globalObject: 'this',
+        libraryExport: 'match' // we expose the match function directly
     },
     module: {
         rules: [

@@ -6,7 +6,7 @@
                 try {
                     const value = 1;
 
-                    const isWorking = patmat.match(value)
+                    const isWorking = match(value)
                         .caseEqual(1, true)
                         .default(false);
                     
