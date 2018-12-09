@@ -10,9 +10,9 @@
   ],
   "scripts": {
     "test": "npx jest",
-    "clean": "rm -fr dist/",
-    "prebuild": "npm run clean && tsc",
-    "build": "webpack --mode=production"
+    "clean": "npx rimraf dist/",
+    "prebuild": "npm run clean && npx tsc",
+    "build": "npx webpack --mode=production"
   },
   "repository": {
     "type": "git",
@@ -38,6 +38,7 @@
     "@types/jest": "^23.3.10",
     "babel-loader": "^8.0.4",
     "jest": "^23.6.0",
+    "rimraf": "^2.6.2",
     "ts-jest": "^23.10.5",
     "typescript": "^3.1.6",
     "webpack": "^4.26.1",
