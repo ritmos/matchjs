@@ -43,8 +43,6 @@ const areWeInTheFuture = match(new Date())
 
 ### API
 
-TBD
-
 If you are using typescript or an IDE with autocompletion, just write match. and explore all the options available.
 Basically you have cases for every javascript primitive type + instance checks. Almost every case method has a companion
 method ended in "If"; This allows to put an extra predicate if the case is not enough. To end the match expression use
@@ -84,7 +82,7 @@ const infoDetails = match(info)
     .default("Unknown information received");
 ```
 
-#### Set multiple return type (for typescript)
+#### Float comparison
 
 ```typescript
 import {match} from "patmatjs";

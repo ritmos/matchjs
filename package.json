@@ -1,6 +1,6 @@
 {
   "name": "patmatjs",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Javascript pattern matching utility backed by typescript",
   "main": "./dist/umd/index.js",
   "browser": "./dist/browser/index.js",
