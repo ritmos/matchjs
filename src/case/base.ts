@@ -13,7 +13,7 @@ export class IfCase<R> implements Case<R> {
 
     matches(element: any): boolean {
         try {
-            return this.matches(element) && this.additionalTest(element);
+            return this.testCase.matches(element) && this.additionalTest(element);
         } catch (e) {
             return false;
         }

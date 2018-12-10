@@ -1,23 +1,23 @@
 import {match} from "../../../src/index";
 
 
-test("caseInstanceLike should match an instance with certain property", () => {
+test("caseInstanceIf should match an instance with certain property", () => {
 
     const x = new ClassConstructor("yunco");
 
     const instanceMatches = match(x)
-        .caseInstanceLike(ClassConstructor, e => e.name === "yunco", true)
+        .caseInstanceIf(ClassConstructor, e => e.name === "yunco", true)
         .default(false);
 
     expect(instanceMatches).toBeTruthy();
 });
 
-test("caseInstanceLike should not match an instance with different property value", () => {
+test("caseInstanceIf should not match an instance with different property value", () => {
 
     const x = new ClassConstructor("canelo");
 
     const instanceMatches = match(x)
-        .caseInstanceLike(ClassConstructor, e => e.name === "yunco", true)
+        .caseInstanceIf(ClassConstructor, e => e.name === "yunco", true)
         .default(false);
 
     expect(instanceMatches).toBeFalsy();

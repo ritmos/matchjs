@@ -20,6 +20,7 @@ import {
     DateOlderThanCase
 } from "./case/date";
 import {Matcher} from "./matcher";
+import {ArrayCase, EmptyArrayCase} from "./case/array";
 
 export class MatcherConstructor {
 
@@ -233,5 +234,21 @@ export class MatcherConstructor {
 
     caseNewerEqualThanIf<R>(other: Date, test: (element: Date) => boolean, mapper: R | ((element: Date) => R)): Matcher<R> {
         return new Matcher(this.element, new IfCase(new DateNewerEqualThanCase(other, mapper), test));
+    }
+
+    caseArray<R>(mapper: R | ((element: Array<any>) => R)) {
+        return new Matcher(this.element, new ArrayCase(mapper));
+    }
+
+    caseArrayIf<R>(test: (element: Array<any>) => boolean, mapper: R | ((element: Array<any>) => R)) {
+        return new Matcher(this.element, new IfCase(new ArrayCase(mapper), test));
+    }
+
+    caseEmptyArray<R>(mapper: R | ((element: Array<any>) => R)) {
+        return new Matcher(this.element, new EmptyArrayCase(mapper));
+    }
+
+    caseEmptyArrayIf<R>(test: () => boolean, mapper: R | ((element: Array<any>) => R)) {
+        return new Matcher(this.element, new IfCase(new EmptyArrayCase(mapper), test));
     }
 }
