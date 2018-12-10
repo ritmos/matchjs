@@ -1,4 +1,4 @@
-import {match} from "../../src/core";
+import {match} from "../../../src/index";
 
 
 test("caseInstance should match an element constructed by a function", () => {

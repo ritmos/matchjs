@@ -1,6 +1,6 @@
 import {BaseMapper, Case} from "./base";
 
-export class BooleanPattern<R> extends BaseMapper<R> implements Case<R> {
+export class BooleanCase<R> extends BaseMapper<R> implements Case<R> {
 
     constructor(readonly mapper: R | ((element: any) => R)) {
         super(mapper);
@@ -11,7 +11,7 @@ export class BooleanPattern<R> extends BaseMapper<R> implements Case<R> {
     }
 }
 
-export class TruePattern<R> extends BooleanPattern<R> implements Case<R> {
+export class TrueCase<R> extends BooleanCase<R> implements Case<R> {
 
     constructor(readonly mapper: R | ((element: any) => R)) {
         super(mapper);
@@ -22,7 +22,7 @@ export class TruePattern<R> extends BooleanPattern<R> implements Case<R> {
     }
 }
 
-export class FalsePattern<R> extends BooleanPattern<R> implements Case<R> {
+export class FalseCase<R> extends BooleanCase<R> implements Case<R> {
 
     constructor(readonly mapper: R | ((element: any) => R)) {
         super(mapper);

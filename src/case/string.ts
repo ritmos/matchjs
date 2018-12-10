@@ -1,6 +1,6 @@
 import {BaseMapper, Case} from "./base";
 
-export class StringPattern<R> extends BaseMapper<R> implements Case<R> {
+export class StringCase<R> extends BaseMapper<R> implements Case<R> {
 
     constructor(readonly mapper: R | ((element: string) => R)) {
         super(mapper);
@@ -11,7 +11,7 @@ export class StringPattern<R> extends BaseMapper<R> implements Case<R> {
     }
 }
 
-export class EmptyStringPattern<R> extends BaseMapper<R> implements Case<R> {
+export class EmptyStringCase<R> extends BaseMapper<R> implements Case<R> {
 
     constructor(readonly mapper: R | ((element: string) => R)) {
         super(mapper);
@@ -22,7 +22,7 @@ export class EmptyStringPattern<R> extends BaseMapper<R> implements Case<R> {
     }
 }
 
-export class StringLikePattern<R> implements Case<R> {
+export class StringLikeCase<R> implements Case<R> {
 
     constructor(readonly pattern: RegExp, readonly mapper: R | ((match: RegExpExecArray) => R)) {
     }

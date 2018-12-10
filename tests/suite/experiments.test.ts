@@ -1,6 +1,6 @@
 
 
-test("fasdas", () => {
+xtest("fasdas", () => {
     const cosa = tuple("a", "b");
     const instance = f(cosa);
     instance.a;

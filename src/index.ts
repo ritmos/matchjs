@@ -1,3 +1,5 @@
-import {match} from "./core";
+import {MatcherConstructor} from "./matcherConstructor";
 
-export {match};
+export function match(element: any): MatcherConstructor {
+    return new MatcherConstructor(element);
+}
